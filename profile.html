@@ -1,1 +1,129 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>پروفایل</title><link rel='stylesheet' href='styles.css'></head><body><h2>پروفایل کاربر</h2></body></html>
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>پروفایل کاربر | MyChat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ccc;
+      margin-bottom: 1rem;
+    }
+
+    .username {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    input[type="file"] {
+      margin: 1rem auto;
+      display: block;
+    }
+
+    .btn {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">پروفایل کاربر</h1>
+
+  <img src="avatar.png" alt="Avatar" class="avatar" id="avatarImage" />
+  <div class="username" id="usernameDisplay">کاربر</div>
+
+  <label for="avatarInput" id="uploadLabel">تغییر عکس نمایه:</label>
+  <input type="file" id="avatarInput" accept="image/*" />
+
+  <button onclick="logout()" class="btn" id="logoutBtn">خروج از حساب</button>
+
+  <p style="margin-top: 2rem;">
+    <a href="settings.html" id="settingsLink">تنظیمات 🔧</a> |
+    <a href="index.html" id="homeLink">خانه 🏠</a>
+  </p>
+
+  <script>
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    const texts = {
+      fa: {
+        title: "پروفایل کاربر",
+        upload: "تغییر عکس نمایه:",
+        logout: "خروج از حساب",
+        settings: "تنظیمات 🔧",
+        home: "خانه 🏠"
+      },
+      en: {
+        title: "User Profile",
+        upload: "Change Avatar:",
+        logout: "Log Out",
+        settings: "Settings 🔧",
+        home: "Home 🏠"
+      },
+      ar: {
+        title: "ملف المستخدم",
+        upload: "تغيير الصورة:",
+        logout: "تسجيل الخروج",
+        settings: "الإعدادات 🔧",
+        home: "الرئيسية 🏠"
+      },
+      ja: {
+        title: "ユーザープロフィール",
+        upload: "アバター変更：",
+        logout: "ログアウト",
+        settings: "設定 🔧",
+        home: "ホーム 🏠"
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('uploadLabel').textContent = t.upload;
+    document.getElementById('logoutBtn').textContent = t.logout;
+    document.getElementById('settingsLink').textContent = t.settings;
+    document.getElementById('homeLink').textContent = t.home;
+
+    const user = JSON.parse(localStorage.getItem('mychat_user') || '{}');
+    document.getElementById('usernameDisplay').textContent = user.username || 'کاربر';
+
+    if (user.avatar) {
+      document.getElementById('avatarImage').src = user.avatar;
+    }
+
+    document.getElementById('avatarInput').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const imageUrl = e.target.result;
+        document.getElementById('avatarImage').src = imageUrl;
+
+        // Save avatar to localStorage
+        const updatedUser = { ...user, avatar: imageUrl };
+        localStorage.setItem('mychat_user', JSON.stringify(updatedUser));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function logout() {
+      localStorage.removeItem('mychat_user');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
