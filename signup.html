@@ -1,1 +1,107 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>ثبت‌نام</title><link rel='stylesheet' href='styles.css'></head><body><h2>فرم ثبت‌نام</h2></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyChat - ثبت‌نام</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">ثبت‌نام در MyChat</h1>
+    <form onsubmit="register(event)">
+      <input type="text" id="username" placeholder="نام کاربری" required />
+      <input type="password" id="password" placeholder="رمز عبور" required />
+      <input type="password" id="confirmPassword" placeholder="تکرار رمز عبور" required />
+      <button type="submit" id="signupBtn">ثبت‌نام</button>
+    </form>
+    <p class="lang-switch">
+      <a href="settings.html">🌐 تغییر زبان</a>
+    </p>
+    <p id="error" class="message error" style="display:none;"></p>
+  </div>
+
+  <script>
+    // تنظیم زبان و جهت صفحه
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    // ترجمه‌ها
+    const texts = {
+      fa: {
+        title: 'ثبت‌نام در MyChat',
+        username: 'نام کاربری',
+        password: 'رمز عبور',
+        confirm: 'تکرار رمز عبور',
+        signup: 'ثبت‌نام',
+        error_match: 'رمزها با هم مطابقت ندارند',
+        error_exists: 'این نام کاربری قبلاً ثبت شده است'
+      },
+      en: {
+        title: 'Sign Up for MyChat',
+        username: 'Username',
+        password: 'Password',
+        confirm: 'Confirm Password',
+        signup: 'Sign Up',
+        error_match: 'Passwords do not match',
+        error_exists: 'This username already exists'
+      },
+      ar: {
+        title: 'التسجيل في MyChat',
+        username: 'اسم المستخدم',
+        password: 'كلمة المرور',
+        confirm: 'تأكيد كلمة المرور',
+        signup: 'تسجيل',
+        error_match: 'كلمتا المرور غير متطابقتين',
+        error_exists: 'اسم المستخدم مسجل مسبقاً'
+      },
+      ja: {
+        title: 'MyChat に登録',
+        username: 'ユーザー名',
+        password: 'パスワード',
+        confirm: 'パスワード確認',
+        signup: '登録',
+        error_match: 'パスワードが一致しません',
+        error_exists: 'このユーザー名はすでに存在します'
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('username').placeholder = t.username;
+    document.getElementById('password').placeholder = t.password;
+    document.getElementById('confirmPassword').placeholder = t.confirm;
+    document.getElementById('signupBtn').textContent = t.signup;
+
+    function register(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+      const errorEl = document.getElementById('error');
+
+      if (password !== confirmPassword) {
+        errorEl.textContent = t.error_match;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+
+      if (users.find(u => u.username === username)) {
+        errorEl.textContent = t.error_exists;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const newUser = { username, password };
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      window.location.href = 'chat.html';
+    }
+  </script>
+</body>
+</html>
