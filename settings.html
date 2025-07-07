@@ -1,1 +1,178 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>تنظیمات</title><link rel='stylesheet' href='styles.css'></head><body><h2>تنظیمات زبان و ظاهر</h2></body></html>
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>تنظیمات حساب | MyChat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      font-size: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .danger {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">تنظیمات حساب</h1>
+
+  <div class="section">
+    <label id="themeLabel">تم رابط کاربری</label>
+    <select id="themeSelect" onchange="setTheme(this.value)">
+      <option value="light">🌞 روشن</option>
+      <option value="dark">🌙 تاریک</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <label id="langLabel">زبان</label>
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="fa">🇮🇷 فارسی</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 العربية</option>
+      <option value="ja">🇯🇵 日本語</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <label id="changePassLabel">تغییر رمز عبور</label>
+    <input type="password" id="oldPass" placeholder="رمز فعلی">
+    <input type="password" id="newPass" placeholder="رمز جدید">
+    <input type="password" id="confirmPass" placeholder="تأیید رمز جدید">
+    <button onclick="changePassword()" id="changeBtn">تغییر رمز</button>
+  </div>
+
+  <div class="section">
+    <button onclick="deleteAccount()" class="danger" id="deleteBtn">❌ حذف حساب کاربری</button>
+  </div>
+
+  <p style="text-align:center;"><a href="index.html" id="backLink">بازگشت به خانه</a></p>
+
+  <script>
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    const theme = localStorage.getItem('mychat_theme') || 'light';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    document.getElementById('themeSelect').value = theme;
+    document.body.className = theme;
+
+    const texts = {
+      fa: {
+        title: "تنظیمات حساب",
+        theme: "تم رابط کاربری",
+        lang: "زبان",
+        changePass: "تغییر رمز عبور",
+        changeBtn: "تغییر رمز",
+        deleteBtn: "❌ حذف حساب کاربری",
+        back: "بازگشت به خانه"
+      },
+      en: {
+        title: "Account Settings",
+        theme: "Theme",
+        lang: "Language",
+        changePass: "Change Password",
+        changeBtn: "Update Password",
+        deleteBtn: "❌ Delete Account",
+        back: "Back to Home"
+      },
+      ar: {
+        title: "إعدادات الحساب",
+        theme: "السمة",
+        lang: "اللغة",
+        changePass: "تغيير كلمة المرور",
+        changeBtn: "تغيير",
+        deleteBtn: "❌ حذف الحساب",
+        back: "العودة"
+      },
+      ja: {
+        title: "アカウント設定",
+        theme: "テーマ",
+        lang: "言語",
+        changePass: "パスワードの変更",
+        changeBtn: "更新",
+        deleteBtn: "❌ アカウント削除",
+        back: "ホームに戻る"
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('themeLabel').textContent = t.theme;
+    document.getElementById('langLabel').textContent = t.lang;
+    document.getElementById('changePassLabel').textContent = t.changePass;
+    document.getElementById('changeBtn').textContent = t.changeBtn;
+    document.getElementById('deleteBtn').textContent = t.deleteBtn;
+    document.getElementById('backLink').textContent = t.back;
+
+    function setTheme(theme) {
+      localStorage.setItem('mychat_theme', theme);
+      document.body.className = theme;
+    }
+
+    function setLanguage(code) {
+      localStorage.setItem('mychat_language', code);
+      location.reload();
+    }
+
+    function changePassword() {
+      const oldPass = document.getElementById('oldPass').value;
+      const newPass = document.getElementById('newPass').value;
+      const confirm = document.getElementById('confirmPass').value;
+
+      if (!oldPass || !newPass || !confirm) {
+        alert('لطفاً تمام فیلدها را پر کنید.');
+        return;
+      }
+
+      if (newPass !== confirm) {
+        alert('رمز جدید با تکرار آن مطابقت ندارد.');
+        return;
+      }
+
+      // در اینجا می‌توان به API رمز قبلی را ارسال کرد.
+      alert('رمز عبور با موفقیت تغییر یافت.');
+    }
+
+    function deleteAccount() {
+      if (confirm('آیا مطمئن هستید که می‌خواهید حساب را حذف کنید؟ این عملیات غیرقابل بازگشت است.')) {
+        // در نسخه واقعی باید به سرور اطلاع دهید.
+        alert('حساب کاربری حذف شد.');
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+</body>
+</html>
