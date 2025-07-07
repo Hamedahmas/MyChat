@@ -1,1 +1,132 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>خانه</title><link rel='stylesheet' href='styles.css'></head><body><h2>داشبورد</h2></body></html>
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>خانه | MyChat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .menu a {
+      display: block;
+      background-color: #e0e0e0;
+      padding: 1rem;
+      border-radius: 1rem;
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .menu a:hover {
+      background-color: #d0d0d0;
+    }
+
+    .logout-btn {
+      margin-top: 2rem;
+      color: red;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .avatar-small {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <img src="avatar.png" alt="Avatar" class="avatar-small" id="userAvatar">
+  <h1 id="welcomeText">خوش آمدید، کاربر!</h1>
+
+  <div class="menu">
+    <a href="chat.html" id="chatLink">💬 گفت‌وگوها</a>
+    <a href="users.html" id="usersLink">👥 کاربران</a>
+    <a href="settings.html" id="settingsLink">⚙️ تنظیمات</a>
+    <a href="profile.html" id="profileLink">🙍‍♂️ پروفایل</a>
+  </div>
+
+  <button onclick="logout()" class="logout-btn" id="logoutBtn">🚪 خروج از حساب</button>
+
+  <script>
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    const user = JSON.parse(localStorage.getItem('mychat_user') || '{}');
+
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    const texts = {
+      fa: {
+        welcome: "خوش آمدید، ",
+        chat: "💬 گفت‌وگوها",
+        users: "👥 کاربران",
+        settings: "⚙️ تنظیمات",
+        profile: "🙍‍♂️ پروفایل",
+        logout: "🚪 خروج از حساب"
+      },
+      en: {
+        welcome: "Welcome, ",
+        chat: "💬 Chats",
+        users: "👥 Users",
+        settings: "⚙️ Settings",
+        profile: "🙍‍♂️ Profile",
+        logout: "🚪 Log out"
+      },
+      ar: {
+        welcome: "أهلاً، ",
+        chat: "💬 المحادثات",
+        users: "👥 المستخدمون",
+        settings: "⚙️ الإعدادات",
+        profile: "🙍‍♂️ الملف الشخصي",
+        logout: "🚪 تسجيل الخروج"
+      },
+      ja: {
+        welcome: "ようこそ、",
+        chat: "💬 チャット",
+        users: "👥 ユーザー",
+        settings: "⚙️ 設定",
+        profile: "🙍‍♂️ プロフィール",
+        logout: "🚪 ログアウト"
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('welcomeText').textContent = t.welcome + (user.username || "کاربر");
+    document.getElementById('chatLink').textContent = t.chat;
+    document.getElementById('usersLink').textContent = t.users;
+    document.getElementById('settingsLink').textContent = t.settings;
+    document.getElementById('profileLink').textContent = t.profile;
+    document.getElementById('logoutBtn').textContent = t.logout;
+
+    const avatar = user.avatar || 'avatar.png';
+    document.getElementById('userAvatar').src = avatar;
+
+    function logout() {
+      localStorage.removeItem('mychat_user');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
