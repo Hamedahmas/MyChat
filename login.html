@@ -1,1 +1,87 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>ورود</title><link rel='stylesheet' href='styles.css'></head><body><h2>فرم ورود</h2></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyChat - ورود</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">ورود به MyChat</h1>
+    <form onsubmit="login(event)">
+      <input type="text" id="username" placeholder="نام کاربری" required />
+      <input type="password" id="password" placeholder="رمز عبور" required />
+      <button type="submit" id="loginBtn">ورود</button>
+    </form>
+    <p class="lang-switch">
+      <a href="settings.html">🌐 تغییر زبان</a>
+    </p>
+    <p id="error" class="message error" style="display:none;"></p>
+  </div>
+
+  <script>
+    // تنظیم زبان و جهت صفحه
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    // ترجمه‌ها
+    const texts = {
+      fa: {
+        title: 'ورود به MyChat',
+        username: 'نام کاربری',
+        password: 'رمز عبور',
+        login: 'ورود',
+        error: 'نام کاربری یا رمز عبور اشتباه است'
+      },
+      en: {
+        title: 'Login to MyChat',
+        username: 'Username',
+        password: 'Password',
+        login: 'Login',
+        error: 'Incorrect username or password'
+      },
+      ar: {
+        title: 'تسجيل الدخول إلى MyChat',
+        username: 'اسم المستخدم',
+        password: 'كلمة المرور',
+        login: 'تسجيل الدخول',
+        error: 'اسم المستخدم أو كلمة المرور غير صحيحة'
+      },
+      ja: {
+        title: 'MyChat にログイン',
+        username: 'ユーザー名',
+        password: 'パスワード',
+        login: 'ログイン',
+        error: 'ユーザー名またはパスワードが間違っています'
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('username').placeholder = t.username;
+    document.getElementById('password').placeholder = t.password;
+    document.getElementById('loginBtn').textContent = t.login;
+
+    // لاگین کاربر
+    function login(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        window.location.href = 'chat.html';
+      } else {
+        const error = document.getElementById('error');
+        error.textContent = t.error;
+        error.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
