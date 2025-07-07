@@ -1,1 +1,217 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>چت</title><link rel='stylesheet' href='styles.css'></head><body><h2>صفحه چت</h2></body></html>
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyChat - گفتگو</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+    }
+
+    .chat-header {
+      background: #0088cc;
+      color: white;
+      padding: 1rem;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      background-color: #f9f9f9;
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 10px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .me {
+      background-color: #d1ecf1;
+      align-self: flex-end;
+    }
+
+    .you {
+      background-color: #e2e3e5;
+      align-self: flex-start;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input input[type="text"] {
+      flex-grow: 1;
+    }
+
+    .file-preview {
+      margin-top: 0.5rem;
+    }
+
+    .file-preview img,
+    .file-preview video {
+      max-width: 100px;
+      max-height: 100px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header" id="chatHeader">گفتگو با ...</div>
+    <div class="messages" id="messages"></div>
+    <form class="chat-input" onsubmit="sendMessage(event)">
+      <input type="text" id="textMessage" placeholder="پیام خود را بنویسید..." />
+      <input type="file" id="fileInput" />
+      <button type="submit" id="sendBtn">ارسال</button>
+    </form>
+  </div>
+
+  <script>
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    const texts = {
+      fa: {
+        chatWith: 'گفتگو با ',
+        placeholder: 'پیام خود را بنویسید...',
+        send: 'ارسال'
+      },
+      en: {
+        chatWith: 'Chat with ',
+        placeholder: 'Type your message...',
+        send: 'Send'
+      },
+      ar: {
+        chatWith: 'الدردشة مع ',
+        placeholder: 'اكتب رسالتك...',
+        send: 'إرسال'
+      },
+      ja: {
+        chatWith: 'チャット相手: ',
+        placeholder: 'メッセージを入力...',
+        send: '送信'
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('textMessage').placeholder = t.placeholder;
+    document.getElementById('sendBtn').textContent = t.send;
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const chatWith = localStorage.getItem('chatWith');
+
+    if (!currentUser || !chatWith) {
+      window.location.href = 'users.html';
+    }
+
+    document.getElementById('chatHeader').textContent = `${t.chatWith}${chatWith}`;
+
+    const messagesEl = document.getElementById('messages');
+
+    const chatKey = `chat_${currentUser.username}_to_${chatWith}`;
+    const reverseChatKey = `chat_${chatWith}_to_${currentUser.username}`;
+
+    // بارگذاری پیام‌ها
+    function loadMessages() {
+      messagesEl.innerHTML = '';
+
+      const messages1 = JSON.parse(localStorage.getItem(chatKey)) || [];
+      const messages2 = JSON.parse(localStorage.getItem(reverseChatKey)) || [];
+
+      const allMessages = [...messages1.map(m => ({ ...m, fromMe: true })), ...messages2.map(m => ({ ...m, fromMe: false }))];
+
+      allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+      allMessages.forEach(msg => {
+        const div = document.createElement('div');
+        div.classList.add('message');
+        div.classList.add(msg.fromMe ? 'me' : 'you');
+
+        if (msg.type === 'text') {
+          div.textContent = msg.content;
+        } else if (msg.type === 'image') {
+          const img = document.createElement('img');
+          img.src = msg.content;
+          img.alt = 'image';
+          img.style.maxWidth = '150px';
+          div.appendChild(img);
+        } else if (msg.type === 'video') {
+          const video = document.createElement('video');
+          video.src = msg.content;
+          video.controls = true;
+          video.style.maxWidth = '150px';
+          div.appendChild(video);
+        } else if (msg.type === 'file') {
+          const a = document.createElement('a');
+          a.href = msg.content;
+          a.textContent = msg.filename;
+          a.target = '_blank';
+          div.appendChild(a);
+        }
+
+        messagesEl.appendChild(div);
+      });
+
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    loadMessages();
+
+    // ارسال پیام
+    function sendMessage(e) {
+      e.preventDefault();
+      const text = document.getElementById('textMessage').value.trim();
+      const file = document.getElementById('fileInput').files[0];
+
+      const messages = JSON.parse(localStorage.getItem(chatKey)) || [];
+
+      if (text) {
+        messages.push({
+          type: 'text',
+          content: text,
+          timestamp: Date.now()
+        });
+      } else if (file) {
+        const reader = new FileReader();
+        reader.onload = function() {
+          const base64 = reader.result;
+          const type = file.type.startsWith('image') ? 'image' :
+                       file.type.startsWith('video') ? 'video' : 'file';
+
+          messages.push({
+            type,
+            content: base64,
+            filename: file.name,
+            timestamp: Date.now()
+          });
+
+          localStorage.setItem(chatKey, JSON.stringify(messages));
+          document.getElementById('fileInput').value = '';
+          document.getElementById('textMessage').value = '';
+          loadMessages();
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      localStorage.setItem(chatKey, JSON.stringify(messages));
+      document.getElementById('textMessage').value = '';
+      loadMessages();
+    }
+  </script>
+</body>
+</html>
