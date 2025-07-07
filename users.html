@@ -1,1 +1,101 @@
-<!DOCTYPE html><html lang='fa'><head><meta charset='UTF-8'><title>کاربران</title><link rel='stylesheet' href='styles.css'></head><body><h2>جستجوی کاربران</h2></body></html>
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyChat - کاربران</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">جستجوی کاربران</h1>
+
+    <input type="text" id="search" placeholder="جستجو..." oninput="filterUsers()" />
+
+    <div class="users-list">
+      <ul id="userList"></ul>
+    </div>
+
+    <p class="lang-switch">
+      <a href="settings.html">🌐 تغییر زبان</a>
+    </p>
+  </div>
+
+  <script>
+    // تنظیم زبان و جهت صفحه
+    const lang = localStorage.getItem('mychat_language') || 'fa';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+
+    // ترجمه‌ها
+    const texts = {
+      fa: {
+        title: 'جستجوی کاربران',
+        search: 'جستجو...',
+        startChat: 'شروع گفتگو با '
+      },
+      en: {
+        title: 'Search Users',
+        search: 'Search...',
+        startChat: 'Start chat with '
+      },
+      ar: {
+        title: 'البحث عن المستخدمين',
+        search: 'ابحث...',
+        startChat: 'بدء محادثة مع '
+      },
+      ja: {
+        title: 'ユーザー検索',
+        search: '検索...',
+        startChat: 'チャット開始: '
+      }
+    };
+
+    const t = texts[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('search').placeholder = t.search;
+
+    // بارگذاری کاربران
+    const allUsers = JSON.parse(localStorage.getItem('users')) || [];
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const otherUsers = allUsers.filter(u => u.username !== currentUser.username);
+
+    const listEl = document.getElementById('userList');
+    let visibleUsers = [...otherUsers];
+
+    function renderUsers() {
+      listEl.innerHTML = '';
+      if (visibleUsers.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'کاربری یافت نشد';
+        if (lang === 'en') li.textContent = 'No users found';
+        else if (lang === 'ar') li.textContent = 'لم يتم العثور على مستخدمين';
+        else if (lang === 'ja') li.textContent = 'ユーザーが見つかりません';
+        listEl.appendChild(li);
+        return;
+      }
+
+      visibleUsers.forEach(user => {
+        const li = document.createElement('li');
+        li.textContent = user.username;
+        li.onclick = () => startChat(user.username);
+        listEl.appendChild(li);
+      });
+    }
+
+    function filterUsers() {
+      const query = document.getElementById('search').value.trim().toLowerCase();
+      visibleUsers = otherUsers.filter(u => u.username.toLowerCase().includes(query));
+      renderUsers();
+    }
+
+    function startChat(recipient) {
+      localStorage.setItem('chatWith', recipient);
+      window.location.href = 'chat.html';
+    }
+
+    // اجرای اولیه
+    renderUsers();
+  </script>
+</body>
+</html>
